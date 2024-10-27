@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Map;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+use Closure;
 
 class MapController extends Controller
 {
@@ -35,6 +39,7 @@ class MapController extends Controller
     // Menyimpan map baru ke database
     public function store(Request $request)
     {
+        // Validasi data yang diterima
         $request->validate([
             'name' => 'required|string|max:255',
             'latitude' => 'required|numeric',
@@ -43,9 +48,24 @@ class MapController extends Controller
             'description' => 'nullable|string',
             'map_type' => 'required|string',
             'polygon' => 'required|string',
+            'file' => 'nullable|file|max:100000',
         ]);
 
-        Map::create($request->all());
+        // Simpan data peta ke database
+        $mapData = $request->all();
+
+        // Jika ada file yang diupload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            
+            // Simpan file dan dapatkan path-nya
+            $path = $file->store('uploads', 'public');
+            
+            // Simpan path file dalam data peta
+            $mapData['file_path'] = $path; // Gantilah 'file_path' dengan kolom yang sesuai di tabel Anda
+        }
+
+        Map::create($mapData);
 
         return redirect()->route('admin.maps.index')->with('success', 'Map created successfully.');
     }
@@ -87,4 +107,39 @@ class MapController extends Controller
 
         return redirect()->route('admin.maps.index')->with('success', 'Map deleted successfully.');
     }
+    
+    public function saveJson(Request $request, $id)
+    {
+        Log::info("Save JSON called for map ID: $id");
+        // Temukan map berdasarkan ID
+        $map = Map::findOrFail($id);
+
+        // Ambil data polygon dari map
+        $polygonData = $map->polygon; 
+
+        // Tentukan nama file dan isi konten
+        $fileName = $map->name . '.json';
+        $fileContent = json_encode([
+            'type' => 'FeatureCollection',
+            'features' => [[
+                'type' => 'Feature',
+                'geometry' => json_decode($polygonData),
+                'properties' => [
+                    'name' => $map->name,
+                ],
+            ]]
+        ], JSON_PRETTY_PRINT);
+
+        // Simpan file di storage lokal
+        Storage::disk('local')->put($fileName, $fileContent);
+
+        // Kembalikan file untuk diunduh
+        return Response::download(storage_path('app/' . $fileName))->deleteFileAfterSend(true);
+    }
+    public function handle($request, Closure $next)
+{
+    Log::info('Request Method:', ['method' => $request->method()]);
+    
+    return $next($request);
+}
 }
