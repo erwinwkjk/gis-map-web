@@ -19,7 +19,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.maps.store') }}" method="POST">
+        <form action="{{ route('admin.maps.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -49,21 +49,28 @@
                 <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label for="map_type">Tipe Map</label>
                 <select class="form-control" id="map_type" name="map_type">
-                    <option value="roadmap" {{ old('map_type') == 'roadmap' ? 'selected' : '' }}>Roadmap</option>
-                    <option value="satellite" {{ old('map_type') == 'satellite' ? 'selected' : '' }}>Satellite</option>
-                    <option value="topography" {{ old('map_type') == 'topography' ? 'selected' : '' }}>Topography</option>
+                <option value="roadmap" {{ old('map_type') == 'roadmap' ? 'selected' : '' }}>Roadmap</option>
+                <option value="satellite" {{ old('map_type') == 'satellite' ? 'selected' : '' }}>Satellite</option>
+                <option value="topography" {{ old('map_type') == 'topography' ? 'selected' : '' }}>Topography</option>
                 </select>
             </div>
 
             <!-- Leaflet Map untuk Menggambar Polygon -->
             <div id="map" style="height: 400px; margin-bottom: 15px;"></div>
 
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label for="polygon">Polygon</label>
                 <textarea class="form-control" id="polygon" name="polygon" rows="4" readonly>{{ old('polygon') }}</textarea>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="jsonFile">Upload File:</label>
+                <input type="file" name="jsonFile" id="jsonFile" accept=".json,.geojson" style="display: none;" onchange="document.getElementById('file-name').innerText = this.files[0].name;">
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('jsonFile').click()">Choose File</button>
+                <span id="file-name" class="ml-2">No file chosen</span>
             </div>
 
             <button type="submit" class="btn btn-primary">Simpan Map</button>
@@ -77,8 +84,7 @@
     <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
 
     <script>
-        var map = L.map('map').setView([{{ old('latitude', -6.914744) }}, {{ old('longitude', 107.60981) }}],
-            {{ old('zoom', 13) }});
+        var map = L.map('map').setView([{{ old('latitude', -6.914744) }}, {{ old('longitude', 107.60981) }}], {{ old('zoom', 13) }});
 
         function getTileLayerUrl(mapType) {
             switch (mapType) {
@@ -104,17 +110,8 @@
         map.addLayer(drawnItems);
 
         var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems
-            },
-            draw: {
-                polygon: true,
-                rectangle: true,
-                polyline: true,
-                circle: true,
-                marker: true,
-                circlemarker: false
-            }
+            edit: { featureGroup: drawnItems },
+            draw: { polygon: true, rectangle: true, polyline: true, circle: true, marker: true, circlemarker: false }
         });
         map.addControl(drawControl);
 
@@ -125,8 +122,7 @@
             };
 
             drawnItems.eachLayer(function(layer) {
-                if (layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.Marker ||
-                    layer instanceof L.Circle) {
+                if (layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.Marker || layer instanceof L.Circle) {
                     var feature = {
                         type: 'Feature',
                         geometry: {
@@ -150,13 +146,9 @@
             let featureDescription = prompt("Masukkan Deskripsi Fitur:");
 
             if (featureName && featureDescription) {
-                // Menambahkan nama dan deskripsi sebagai properti
                 layer.feature = layer.feature || { type: "Feature" };
                 layer.feature.properties = { name: featureName, description: featureDescription };
-
-                // Menampilkan tooltip dengan nama dan deskripsi saat fitur diklik
                 layer.bindTooltip(`<b>${featureName}</b><br>${featureDescription}`);
-
                 drawnItems.addLayer(layer);
                 updatePolygonTextarea();
             } else {
@@ -175,5 +167,25 @@
 
         map.on('moveend', updateMapInputs);
         map.on('zoomend', updateMapInputs);
+
+        document.getElementById('jsonFile').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var json = JSON.parse(event.target.result);
+                    document.getElementById('polygon').value = JSON.stringify(json, null, 4);
+
+                    // Clear any existing layers and add new ones from the JSON data
+                    drawnItems.clearLayers();
+                    L.geoJSON(json).eachLayer(function(layer) {
+                        drawnItems.addLayer(layer);
+                    });
+
+                    alert("Polygon field has been populated from the uploaded JSON file.");
+                };
+                reader.readAsText(file);
+            }
+        });
     </script>
 @endsection
