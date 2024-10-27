@@ -144,25 +144,42 @@ class MapController extends Controller
 }
 
 public function downloadJson($id)
-    {
-        // Temukan data berdasarkan ID
-        $map = Map::findOrFail($id);
+{
+    // Temukan data berdasarkan ID
+    $map = Map::findOrFail($id);
 
-        // Decode string polygon menjadi objek JSON
-        $mapData = $map->toArray();
-        $mapData['polygon'] = json_decode($mapData['polygon']); // Konversi dari string ke objek JSON
+    // Decode string polygon menjadi objek JSON
+    $polygonData = json_decode($map->polygon, true); // Ubah menjadi array asosiatif
 
-        // Konversi data menjadi JSON yang terformat
-        $jsonData = json_encode($mapData, JSON_PRETTY_PRINT);
+    // Buat struktur JSON yang diinginkan
+    $jsonData = [
+        'type' => 'FeatureCollection',
+        'features' => [
+            [
+                'type' => 'Feature',
+                'geometry' => [
+                    'type' => 'Polygon',
+                    'coordinates' => $polygonData['features'][0]['geometry']['coordinates'], // Ambil koordinat dari data polygon
+                ],
+                'properties' => [
+                    'name' => $map->name,
+                    'description' => $map->description,
+                ],
+            ],
+        ],
+    ];
 
-        // Tentukan nama file JSON
-        $fileName = 'map_' . $map->id . '.json';
+    // Konversi data menjadi JSON yang terformat
+    $jsonDataFormatted = json_encode($jsonData, JSON_PRETTY_PRINT);
 
-        // Kembalikan file JSON untuk diunduh
-        return response()->streamDownload(function () use ($jsonData) {
-            echo $jsonData;
-        }, $fileName, [
-            'Content-Type' => 'application/json',
-        ]);
+    // Tentukan nama file JSON
+    $fileName = 'map_' . $map->id . '.json';
+
+    // Kembalikan file JSON untuk diunduh
+    return response()->streamDownload(function () use ($jsonDataFormatted) {
+        echo $jsonDataFormatted;
+    }, $fileName, [
+        'Content-Type' => 'application/json',
+    ]);
     }
 }
