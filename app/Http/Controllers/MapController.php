@@ -57,10 +57,10 @@ class MapController extends Controller
         // Jika ada file yang diupload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            
+
             // Simpan file dan dapatkan path-nya
             $path = $file->store('uploads', 'public');
-            
+
             // Simpan path file dalam data peta
             $mapData['file_path'] = $path; // Gantilah 'file_path' dengan kolom yang sesuai di tabel Anda
         }
@@ -107,7 +107,7 @@ class MapController extends Controller
 
         return redirect()->route('admin.maps.index')->with('success', 'Map deleted successfully.');
     }
-    
+
     public function saveJson(Request $request, $id)
     {
         Log::info("Save JSON called for map ID: $id");
@@ -115,7 +115,7 @@ class MapController extends Controller
         $map = Map::findOrFail($id);
 
         // Ambil data polygon dari map
-        $polygonData = $map->polygon; 
+        $polygonData = $map->polygon;
 
         // Tentukan nama file dan isi konten
         $fileName = $map->name . '.json';
@@ -139,7 +139,30 @@ class MapController extends Controller
     public function handle($request, Closure $next)
 {
     Log::info('Request Method:', ['method' => $request->method()]);
-    
+
     return $next($request);
 }
+
+public function downloadJson($id)
+    {
+        // Temukan data berdasarkan ID
+        $map = Map::findOrFail($id);
+
+        // Decode string polygon menjadi objek JSON
+        $mapData = $map->toArray();
+        $mapData['polygon'] = json_decode($mapData['polygon']); // Konversi dari string ke objek JSON
+
+        // Konversi data menjadi JSON yang terformat
+        $jsonData = json_encode($mapData, JSON_PRETTY_PRINT);
+
+        // Tentukan nama file JSON
+        $fileName = 'map_' . $map->id . '.json';
+
+        // Kembalikan file JSON untuk diunduh
+        return response()->streamDownload(function () use ($jsonData) {
+            echo $jsonData;
+        }, $fileName, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
 }
