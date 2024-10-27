@@ -16,9 +16,8 @@ Route::get('/maps', [App\Http\Controllers\PageController::class, 'index'])->name
 
 Route::get('/maps/{id}', [App\Http\Controllers\PageController::class, 'show'])->name('maps.show');
 
-Route::group(['middleware' => 'admin.auth'],function(){
-    Route::post('admin/maps/{id}/saveJson', [MapController::class, 'saveJson'])->name('admin.maps.saveJson');    
-});
+Route::get('/admin/maps/{id}/downloadJson', [MapController::class, 'downloadJson'])->name('admin.maps.downloadJson');
+
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::resource('/maps', MapController::class);

@@ -63,9 +63,9 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm"
                                     onclick="return confirm('Yakin ingin menghapus map ini?')">Delete</button>
-                
+
                             <a href="{{ route('admin.maps.show', $map->id) }}" class="btn btn-info btn-sm">Lihat Map</a>
-                            <a href="{{ route('admin.maps.saveJson', $map->id) }}" class="btn btn-secondary btn-sm">Unduh JSON</a>
+                            <a href="{{ route('admin.maps.downloadJson', $map->id) }}" class="btn btn-secondary btn-sm">Unduh JSON</a>
                         </td>
                     </tr>
                 @endforeach
