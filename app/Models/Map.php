@@ -14,5 +14,6 @@ class Map extends Model
         'description',
         'map_type',
         'polygon',
+        'marker_color',
     ];
 }

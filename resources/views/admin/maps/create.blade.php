@@ -49,6 +49,15 @@
                 <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
             </div>
 
+            <div class="form-group">
+                <label for="marker_color">Warna Marker</label>
+                <select class="form-control" id="marker_color" name="marker_color">
+                    <option value="red">Merah</option>
+                    <option value="yellow">Kuning</option>
+                    <option value="green">Hijau</option>
+                </select>
+            </div>
+
             <div class="form-group mb-3">
                 <label for="map_type">Tipe Map</label>
                 <select class="form-control" id="map_type" name="map_type">
@@ -149,6 +158,37 @@
                 layer.feature = layer.feature || { type: "Feature" };
                 layer.feature.properties = { name: featureName, description: featureDescription };
                 layer.bindTooltip(`<b>${featureName}</b><br>${featureDescription}`);
+
+                // Set marker dengan warna sesuai pilihan
+                if (layer instanceof L.Marker) {
+                    const selectedColor = document.getElementById('marker_color').value;
+                    let iconUrl;
+
+                    switch (selectedColor) {
+                        case 'red':
+                            iconUrl = '/images/marker_merah.png';
+                            break;
+                        case 'yellow':
+                            iconUrl = '/images/marker_kuning.png';
+                            break;
+                        case 'green':
+                            iconUrl = '/images/marker_hijau.png';
+                            break;
+                    }
+
+                    layer.setIcon(L.icon({
+                        iconUrl: iconUrl,
+                        iconSize: [40, 41],
+                        iconAnchor: [20, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    }));
+
+                    // Set latitude dan longitude ke input saat marker ditambahkan
+                    document.getElementById('latitude').value = layer.getLatLng().lat.toFixed(6);
+                    document.getElementById('longitude').value = layer.getLatLng().lng.toFixed(6);
+                }
+
                 drawnItems.addLayer(layer);
                 updatePolygonTextarea();
             } else {
