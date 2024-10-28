@@ -55,6 +55,15 @@
             </div>
 
             <div class="form-group">
+                <label for="marker_color">Warna Marker</label>
+                <select class="form-control" id="marker_color" name="marker_color">
+                    <option value="red" {{ old('marker_color', $map->marker_color) == 'red' ? 'selected' : '' }}>Merah</option>
+                    <option value="yellow" {{ old('marker_color', $map->marker_color) == 'yellow' ? 'selected' : '' }}>Kuning</option>
+                    <option value="green" {{ old('marker_color', $map->marker_color) == 'green' ? 'selected' : '' }}>Hijau</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="map_type">Tipe Map</label>
                 <select class="form-control" id="map_type" name="map_type">
                     <option value="roadmap" {{ old('map_type', $map->map_type) == 'roadmap' ? 'selected' : '' }}>Roadmap
@@ -111,18 +120,42 @@
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
 
+
         @if ($map->polygon)
-            var polygonData = {!! $map->polygon !!};
-            L.geoJSON(polygonData, {
-                onEachFeature: function(feature, layer) {
-                    if (feature.properties && feature.properties.name) {
-                        layer.bindTooltip(
-                            `<b>${feature.properties.name}</b><br>${feature.properties.description}`);
-                    }
-                    drawnItems.addLayer(layer);
+        var polygonData = {!! $map->polygon !!};
+        L.geoJSON(polygonData, {
+            pointToLayer: function(feature, latlng) {
+                var color = '{{ $map->marker_color }}'; // Ambil warna dari database
+                console.log("Marker color:", color); // Tambahkan log untuk melihat warna
+                return L.marker(latlng, { icon: getMarkerIcon(color) });
+            },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties && feature.properties.name) {
+                    layer.bindTooltip(
+                        `<b>${feature.properties.name}</b><br>${feature.properties.description}`
+                    );
                 }
-            });
+                drawnItems.addLayer(layer);
+            }
+        });
         @endif
+
+        // Fungsi untuk mendapatkan icon marker sesuai warna
+        function getMarkerIcon(color) {
+        const colors = {
+            red: '/images/marker_merah.png',
+            yellow: '/images/marker_kuning.png',
+            green: '/images/marker_hijau.png'
+        };
+        return L.icon({
+            iconUrl: colors[color] || colors.red, // Default ke merah
+            iconSize: [40, 41],
+            iconAnchor: [20, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        }
+
 
         var drawControl = new L.Control.Draw({
             edit: {

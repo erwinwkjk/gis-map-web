@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('map_type');
             $table->longText('polygon');
+            $table->string('marker_color')->nullable();
             $table->timestamps();
         });
     }

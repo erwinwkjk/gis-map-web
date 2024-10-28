@@ -60,17 +60,55 @@
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
 
-        @if ($map->polygon)
-            var polygonData = {!! $map->polygon !!};
-            L.geoJSON(polygonData, {
-                onEachFeature: function(feature, layer) {
-                    if (feature.properties && feature.properties.name) {
-                        layer.bindTooltip(
-                            `<b>${feature.properties.name}</b><br>${feature.properties.description}`);
-                    }
-                    drawnItems.addLayer(layer);
-                }
+        // Fungsi untuk mendapatkan icon marker sesuai warna
+        function getMarkerIcon(color) {
+            const colors = {
+                red: '/images/marker_merah.png',
+                yellow: '/images/marker_kuning.png',
+                green: '/images/marker_hijau.png'
+            };
+            return L.icon({
+                iconUrl: colors[color] || colors.red, // Default ke merah
+                iconSize: [40, 41],
+                iconAnchor: [20, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
             });
-        @endif
+        }
+
+        @if ($map->polygon)
+        var polygonData = {!! $map->polygon !!};
+        L.geoJSON(polygonData, {
+            pointToLayer: function(feature, latlng) {
+                // Ambil warna dari properti 'marker_color' dalam fitur, atau gunakan warna default
+                var color = '{{ $map->marker_color }}'; // Ambil warna dari database langsung
+                return L.marker(latlng, { icon: getMarkerIcon(color) });
+            },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties && feature.properties.name) {
+                    layer.bindTooltip(
+                        `<b>${feature.properties.name}</b><br>${feature.properties.description}`
+                    );
+                }
+                drawnItems.addLayer(layer);
+            }
+        });
+    @endif
+
+    // Fungsi untuk mendapatkan icon marker sesuai warna
+    function getMarkerIcon(color) {
+        const colors = {
+            red: '/images/marker_merah.png',
+            yellow: '/images/marker_kuning.png',
+            green: '/images/marker_hijau.png'
+        };
+        return L.icon({
+            iconUrl: colors[color] || colors.red, // Default ke merah jika warna tidak dikenal
+            iconSize: [40, 41],
+            iconAnchor: [20, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    }
     </script>
 @endsection

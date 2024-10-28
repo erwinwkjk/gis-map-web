@@ -49,6 +49,7 @@ class MapController extends Controller
             'map_type' => 'required|string',
             'polygon' => 'required|string',
             'file' => 'nullable|file|max:100000',
+            'marker_color' => 'required|string|in:red,yellow,green', // Validasi warna marker
         ]);
 
         // Simpan data peta ke database
@@ -93,6 +94,7 @@ class MapController extends Controller
             'description' => 'nullable|string',
             'map_type' => 'required|string',
             'polygon' => 'required|string',
+            'marker_color' => 'required|string|in:red,yellow,green', // Validasi warna marker
         ]);
 
         $map->update($request->all());

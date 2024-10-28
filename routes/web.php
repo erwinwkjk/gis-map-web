@@ -18,6 +18,7 @@ Route::get('/maps/{id}', [App\Http\Controllers\PageController::class, 'show'])->
 
 Route::get('/admin/maps/{id}/downloadJson', [MapController::class, 'downloadJson'])->name('admin.maps.downloadJson');
 
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::resource('/maps', MapController::class);
