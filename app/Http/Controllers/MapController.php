@@ -11,6 +11,11 @@ use Closure;
 
 class MapController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     // Menampilkan daftar semua maps
     public function index(Request $request)
     {
@@ -139,49 +144,49 @@ class MapController extends Controller
         return Response::download(storage_path('app/' . $fileName))->deleteFileAfterSend(true);
     }
     public function handle($request, Closure $next)
-{
-    Log::info('Request Method:', ['method' => $request->method()]);
+    {
+        Log::info('Request Method:', ['method' => $request->method()]);
 
-    return $next($request);
-}
+        return $next($request);
+    }
 
-public function downloadJson($id)
-{
-    // Temukan data berdasarkan ID
-    $map = Map::findOrFail($id);
+    public function downloadJson($id)
+    {
+        // Temukan data berdasarkan ID
+        $map = Map::findOrFail($id);
 
-    // Decode string polygon menjadi objek JSON
-    $polygonData = json_decode($map->polygon, true); // Ubah menjadi array asosiatif
+        // Decode string polygon menjadi objek JSON
+        $polygonData = json_decode($map->polygon, true); // Ubah menjadi array asosiatif
 
-    // Buat struktur JSON yang diinginkan
-    $jsonData = [
-        'type' => 'FeatureCollection',
-        'features' => [
-            [
-                'type' => 'Feature',
-                'geometry' => [
-                    'type' => 'Polygon',
-                    'coordinates' => $polygonData['features'][0]['geometry']['coordinates'], // Ambil koordinat dari data polygon
-                ],
-                'properties' => [
-                    'name' => $map->name,
-                    'description' => $map->description,
+        // Buat struktur JSON yang diinginkan
+        $jsonData = [
+            'type' => 'FeatureCollection',
+            'features' => [
+                [
+                    'type' => 'Feature',
+                    'geometry' => [
+                        'type' => 'Polygon',
+                        'coordinates' => $polygonData['features'][0]['geometry']['coordinates'], // Ambil koordinat dari data polygon
+                    ],
+                    'properties' => [
+                        'name' => $map->name,
+                        'description' => $map->description,
+                    ],
                 ],
             ],
-        ],
-    ];
+        ];
 
-    // Konversi data menjadi JSON yang terformat
-    $jsonDataFormatted = json_encode($jsonData, JSON_PRETTY_PRINT);
+        // Konversi data menjadi JSON yang terformat
+        $jsonDataFormatted = json_encode($jsonData, JSON_PRETTY_PRINT);
 
-    // Tentukan nama file JSON
-    $fileName = 'map_' . $map->id . '.json';
+        // Tentukan nama file JSON
+        $fileName = 'map_' . $map->id . '.json';
 
-    // Kembalikan file JSON untuk diunduh
-    return response()->streamDownload(function () use ($jsonDataFormatted) {
-        echo $jsonDataFormatted;
-    }, $fileName, [
-        'Content-Type' => 'application/json',
-    ]);
+        // Kembalikan file JSON untuk diunduh
+        return response()->streamDownload(function () use ($jsonDataFormatted) {
+            echo $jsonDataFormatted;
+        }, $fileName, [
+            'Content-Type' => 'application/json',
+        ]);
     }
 }
