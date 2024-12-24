@@ -20,7 +20,7 @@ class PageController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
-        return view('maps.index', compact('maps', 'search', 'perPage'));
+        return view('template.index', compact('maps', 'search', 'perPage'));
     }
 
     public function show($id)
