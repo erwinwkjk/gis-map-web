@@ -9,21 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('maps', function (Blueprint $table) {
-            $table->string('marker_color')->nullable(); // Pastikan ini sesuai
-        });
-
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+    public function up()
+{
+    if (!Schema::hasColumn('maps', 'marker_color')) {
         Schema::table('maps', function (Blueprint $table) {
             $table->string('marker_color')->nullable();
         });
     }
+}
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down()
+    {
+        Schema::table('maps', function (Blueprint $table) {
+            $table->dropColumn('marker_color');
+        });
+    }
+    
 };
