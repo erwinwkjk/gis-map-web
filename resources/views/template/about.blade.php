@@ -1,78 +1,105 @@
 @extends('layouts.template')
 
-<main>
-    @section('content')
-        <!--GALLERY-->
-    <section class="whats-news-area pt-50 pb-20">
-        <div class="container">
+@section('style')
+<!-- DataTables -->
+<link rel="stylesheet" href="{{ asset('LTE/plugins/fontawesome-free/css/all.min.css') }}">
+<link rel="stylesheet" href="{{asset('LTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
+<link rel="stylesheet" href="{{asset('LTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
+<link rel="stylesheet" href="{{asset('LTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+@endsection
+
+@section('content')
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Galeri</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Galeri</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="row d-flex justify-content-between">
-                        <div class="col-lg-3 col-md-3">
-                            <div class="section-tittle mb-30">
-                                <h3>GALLERY</h3>
-                            </div>
+                <div class="col-12">
+                    <!-- Card Galeri -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Daftar Galeri</h3>
+                            <a href="#" class="btn btn-success float-right">Add New Gallery</a>
                         </div>
-                        <div class="col-lg-9 col-md-9">
-                            <div class="properties__button"></div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <table id="tabel-galeri" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Image</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Sample Title 1</td>
+                                        <td>Sample Description 1</td>
+                                        <td><img src="{{ asset('sample-image1.jpg') }}" width="250" alt="Sample 1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Sample Title 2</td>
+                                        <td>Sample Description 2</td>
+                                        <td><img src="{{ asset('sample-image2.jpg') }}" width="250" alt="Sample 2"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                        <!-- /.card-body -->
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <!-- Nav Card -->
-                            <div class="tab-content" id="nav-tabContent">
-                                <!-- card one -->
-                                <div class="tab-pane fade show active" id="nav-home" role="tabpanel"
-                                    aria-labelledby="nav-home-tab">
-                                    <div class="whats-news-caption">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6">
-                                                <div class="single-what-news mb-100">
-                                                    <div class="what-img">
-                                                        <img src="assets/img/news/whatNews1.jpg" alt="">
-                                                    </div>
-                                                    <div class="what-cap">
-                                                        <span class="color1">GEMPA TEKTONIK</span>
-                                                        <h4><a href="#">gempa bumi yang disebabkan oleh pergerakan lempeng tektonik di bawah permukaan bumi</a></h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6">
-                                                <div class="single-what-news mb-100">
-                                                    <div class="what-img">
-                                                        <img src="assets/img/news/whatNews2.jpg" alt="">
-                                                    </div>
-                                                    <div class="what-cap">
-                                                        <span class="color1">SESAR</span>
-                                                        <h4><a href="#">patahan atau retakan pada lapisan bumi yang mengalami pergerakan relatif antara dua blok batuan</a></h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6">
-                                                <div class="single-what-news mb-100">
-                                                    <div class="what-img">
-                                                        <img src="assets/img/news/whatNews2.jpg" alt="">
-                                                    </div>
-                                                    <div class="what-cap">
-                                                        <span class="color1">SESAR</span>
-                                                        <h4><a href="#">patahan atau retakan pada lapisan bumi yang mengalami pergerakan relatif antara dua blok batuan</a></h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6">
-                                                <div class="single-what-news mb-100">
-                                                    <div class="what-img">
-                                                        <img src="assets/img/news/whatNews2.jpg" alt="">
-                                                    </div>
-                                                    <div class="what-cap">
-                                                        <span class="color1">SESAR</span>
-                                                        <h4><a href="#">patahan atau retakan pada lapisan bumi yang mengalami pergerakan relatif antara dua blok batuan</a></h4>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-    @endsection
-</main>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+@endsection
+
+@section('script')
+<!-- DataTables  & Plugins -->
+<script src="{{asset('LTE/plugins/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('LTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
+<script src="{{asset('LTE/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
+<script src="{{asset('LTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
+<script src="{{asset('LTE/plugins/datatables-buttons/js/dataTables.buttons.min.js')}}"></script>
+<script src="{{asset('LTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js')}}"></script>
+<script>
+    $(function () {
+        $('#tabel-galeri').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+        });
+    });
+</script>
+@endsection
